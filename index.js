@@ -2,7 +2,6 @@ const express = require('express');
 const line = require('@line/bot-sdk');
 
 const app = express();
-
 app.use(express.json());
 
 const config = {
@@ -12,17 +11,16 @@ const config = {
 
 const client = new line.Client(config);
 
-// หน้าเช็คระบบ
 app.get('/', (req, res) => {
   res.status(200).send('OK');
 });
 
-// webhook
+// 🔥 ไม่มี line.middleware ตรงนี้
 app.post('/webhook', async (req, res) => {
-  res.sendStatus(200); // ตอบ LINE ก่อนกัน 502
+  res.sendStatus(200);
 
   try {
-    const events = req.body.events;
+    const events = req.body.events || [];
 
     for (const event of events) {
       if (event.type !== 'message' || event.message.type !== 'text') continue;
@@ -43,11 +41,6 @@ app.post('/webhook', async (req, res) => {
           type: 'text',
           text: replyText
         });
-      } else {
-        await client.replyMessage(event.replyToken, {
-          type: 'text',
-          text: 'พิมพ์เลข 4 ตัว เช่น 1567'
-        });
       }
     }
   } catch (err) {
@@ -56,5 +49,5 @@ app.post('/webhook', async (req, res) => {
 });
 
 app.listen(process.env.PORT || 3000, () => {
-  console.log('Server running');
+  console.log('Server running...');
 });
